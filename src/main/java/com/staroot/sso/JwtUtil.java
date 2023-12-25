@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
+import java.util.Date;
 public class JwtUtil {
 
     private static final String PRIVATE_KEY_FILE = "private_key.pem";
@@ -13,10 +13,16 @@ public class JwtUtil {
 
     private static final PrivateKey PRIVATE_KEY = KeyUtils.readPrivateKeyFromFile(PRIVATE_KEY_FILE);
     private static final PublicKey PUBLIC_KEY = KeyUtils.readPublicKeyFromFile(PUBLIC_KEY_FILE);
-
+    //private static final long EXPIRATION_TIME = 86400000; // 만료 시간 24시간(ms 단위)
+    private static final long EXPIRATION_TIME = 60000; // 만료 시간 60초
     public static String generateToken(String username) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + EXPIRATION_TIME);
+
         return Jwts.builder()
                 .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiration)
                 .signWith(SignatureAlgorithm.RS256, PRIVATE_KEY)
                 .compact();
     }
